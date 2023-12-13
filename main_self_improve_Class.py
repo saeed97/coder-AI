@@ -2,9 +2,6 @@ import openai
 import os
 
 
-import openai
-import os
-
 class GPT4AutoCoder:
     def __init__(self, api_key, gpt_engine_choice):
         # Set the API key for OpenAI

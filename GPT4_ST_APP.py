@@ -5,13 +5,18 @@ import openai
 # from dotenv import load_dotenv
 
 # load_dotenv()
-
+logo_url = "https://yt3.googleusercontent.com/OR2aEA7-LvbSLdyfow5tjPFSpBvWqJ_aq-laCk0DVUeEf6w9NEDeuqQQlCrW-_DuCVkHATrdvA=s176-c-k-c0x00ffffff-no-rj"
 st.set_page_config(page_title="GPT-4 Auto Coder", layout="wide")
-st.title("DNAC Automation Assistant🤖")
+
+col1, col2 = st.columns((1,4))
+with col1:
+    st.image(logo_url, width=100)
+with col2:
+    st.title("Automation AI Assistant🤖")
 
 # Sidebar
 with st.sidebar:
-    st.title("DNAC")
+    st.title("Models:")
 
     # API key input
     api_key =  "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" or os.environ['OPENAI_API_KEY']
@@ -28,10 +33,24 @@ with st.sidebar:
 
 auto_coder = GPT4AutoCoder(api_key, gpt_engine_choice)
 
-user_input = st.text_area("Enter the lib you want to create with info needed:", height=300,
+user_input = st.text_area("Enter the lib discription you want to create or add exiting lib to improve:", height=300,
  help="enter a descripton of your task here and then select the number of iterations for improvement. Then click on the 'Generate Code' button to get the code.")
 
-code_input = st.text_area("OR paste your existing code here if you want to improve it:", height=300, help="type or paste your existing code here and then select the number of iterations for improvement. Then click on the 'Generate Code' button to get the code improved.")
+# code_input = st.text_area("OR paste your existing code here if you want to improve it:", height=300, help="type or paste your existing code here and then select the number of iterations for improvement. Then click on the 'Generate Code' button to get the code improved.")
+option = st.selectbox(
+    'How would you like to do?',
+    ('Create New Lib', 'Improve Existing Lib', 'Create Test Case'))
+
+match option:
+    case 'Create New Lib':
+        code_input = None
+    case 'Improve Existing Lib':
+        code_input = user_input
+    case 'Create Test Case':
+        st.text('We do not support this yet!')
+        user_input = None
+
+
 
 num_attempts = st.number_input("Enter the number of iterations for improvement:", min_value=0, value=1, step=1, help="GPT will try to improve the code this many times. GPT will add new features, error catching, bug fixing, etc. to the code.")
 
@@ -48,11 +67,8 @@ if st.button("Generate Code"):
                 existing_code = response
                 st.write("Iteration", attempt, "of", num_attempts, "code improvements completed.")
                 st.code(response, language="python")
-        else:
-            if user_input:
-                gpt3_question = GPT4AutoCoder(api_key, gpt_engine_choice).get_project_idea(user_input)
-            else:
-                gpt3_question = GPT4AutoCoder(api_key, gpt_engine_choice).get_project_idea("")
+        elif user_input:
+            gpt3_question = GPT4AutoCoder(api_key, gpt_engine_choice).get_project_idea(user_input)
 
             response = GPT4AutoCoder(api_key, gpt_engine_choice).ask_gpt3(gpt3_question)
 
